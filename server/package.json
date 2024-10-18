@@ -10,8 +10,17 @@
   "author": "Alaa Taleb",
   "license": "ISC",
   "dependencies": {
+    "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.3",
     "express": "^4.21.0",
-    "nodemon": "^3.1.7"
+    "express-graphql": "^0.12.0",
+    "express-validator": "^7.2.0",
+    "graphql": "^15.3.0",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.7.0",
+    "multer": "^1.4.5-lts.1",
+    "nodemon": "^3.1.7",
+    "socket.io": "^4.8.0",
+    "validator": "^13.12.0"
   }
 }
