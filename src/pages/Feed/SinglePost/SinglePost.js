@@ -13,7 +13,7 @@ class SinglePost extends Component {
   };
 
   componentDidMount() {
-    // REST route http://localhost:8080/feed/post/${postId}`
+    // REST route http://localhost:8081/feed/post/${postId}`
     const postId = this.props.match.params.postId;
     console.log("postId react: ", postId);
     const graphqlQuery = {
@@ -31,7 +31,7 @@ class SinglePost extends Component {
       }
     `,
     };
-    fetch("http://localhost:8080/graphql", {
+    fetch("http://localhost:8081/graphql", {
       headers: {
         authorization: "Bearer " + this.props.token,
         "Content-Type": "application/json",
@@ -53,7 +53,7 @@ class SinglePost extends Component {
         this.setState({
           title: resData.data.viewPost.title,
           author: resData.data.viewPost.creator.name,
-          image: "http://localhost:8080/" + resData.data.viewPost.imageUrl,
+          image: "http://localhost:8081/" + resData.data.viewPost.imageUrl,
           date: new Date(resData.data.viewPost.createdAt).toLocaleDateString(
             "en-US"
           ),

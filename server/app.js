@@ -152,7 +152,7 @@ app.use((error, req, res, next) => {
 mongoose
   .connect(process.env.MONGO_URI)
   .then((res) => {
-    const server = app.listen(process.env.PORT || 8080);
+    const server = app.listen(process.env.PORT || 8081);
     // const io = require("./socket").init(server);
     // io.on("connection", (socket) => {
     //   console.log("Client connected!");

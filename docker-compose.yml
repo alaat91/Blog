@@ -1,0 +1,52 @@
+# Services
+services:
+  # Server service
+  server:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    
+    environment:
+      - DB_HOST=mongodb_server
+      - DB_USER=alaa
+      - DB_PASSWORD=VGBROuEktfc8EC6A
+      - NODE_ENV=production  # Set environment to production
+
+    command: npm start  # Automatically runs this when the container starts
+
+    restart: always
+
+    depends_on:
+      - mongodb
+
+  # Client service
+  client:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "80:80"  # Map Nginx's port 80 to your local port 80
+    volumes:
+      - .:/app  # Optional if you need live file mounting
+    environment:
+      - NODE_ENV=production  # Set environment to production
+    restart: always  # Automatically restart container on crash
+
+
+  # Database service
+  mongodb:
+    image: mongo:latest
+    restart: always
+    environment:
+    - DB_HOST=mongodb
+    - MONGO_INITDB_ROOT_USERNAME=alaa
+    - MONGO_INITDB_ROOT_PASSWORD=VGBROuEktfc8EC6A
+    volumes:
+     - mydata:/data/db
+
+
+# Volumes define
+volumes: 
+  mydata:
