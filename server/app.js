@@ -9,6 +9,10 @@ const path = require("path");
 const fs = require("fs");
 const multer = require("multer");
 const { clearImage } = require("./util/helper");
+const compression = require("compression");
+const rfs = require("rotating-file-stream");
+const morgan = require("morgan");
+require("dotenv").config();
 
 // GraphQL
 const { graphqlHTTP } = require("express-graphql");
@@ -39,6 +43,10 @@ const fileFilter = (req, file, cb) => {
     cb(null, false);
   }
 };
+
+// compress res for deployment porpuses
+app.use(compression());
+
 //app.use(bodyParser.urlencoded()); // used when have x-www-form-urlencoded <form>
 app.use(bodyParser.json()); // application/json
 
@@ -49,6 +57,21 @@ app.use(
 
 // To serve static files
 app.use("/images", express.static(path.join(__dirname, "images")));
+
+// create a rotating write stream
+const accessLogStream = rfs.createStream(
+  "access.log",
+  {
+    interval: "1M", // rotate daily
+    path: path.join(__dirname, "log"),
+  },
+  {
+    flags: "a",
+  }
+);
+
+// setup the logger
+app.use(morgan("combined", { stream: accessLogStream }));
 
 // Below Middlewares To allow for CORS requests.
 app.use((req, res, next) => {
@@ -127,11 +150,9 @@ app.use((error, req, res, next) => {
 
 // My DB connection:
 mongoose
-  .connect(
-    "mongodb+srv://alaa:VGBROuEktfc8EC6A@cluster0.6qnuz.mongodb.net/messages?retryWrites=true&w=majority&appName=Cluster0"
-  )
+  .connect(process.env.MONGO_URI)
   .then((res) => {
-    const server = app.listen(8080);
+    const server = app.listen(process.env.PORT || 8080);
     // const io = require("./socket").init(server);
     // io.on("connection", (socket) => {
     //   console.log("Client connected!");
