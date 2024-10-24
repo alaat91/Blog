@@ -34,7 +34,7 @@ class Feed extends Component {
       `,
     };
 
-    fetch("http://localhost:8081/graphql", {
+    fetch(process.env.REACT_APP_API_URL + "/graphql", {
       headers: {
         authorization: "Bearer " + this.props.token,
         "Content-Type": "application/json",
@@ -59,7 +59,7 @@ class Feed extends Component {
     this.loadPosts();
 
     // SocketIO connection code:
-    // const socket = openSocket("http://localhost:8081");
+    // const socket = openSocket("http://localhost:8080");
 
     // socket.on("posts", (data) => {
     //   if (data.action === "create") {
@@ -116,7 +116,7 @@ class Feed extends Component {
       page--;
       this.setState({ postPage: page });
     }
-    // REST "http://localhost:8081/feed/posts?page="+ page
+    // REST "http://localhost:8080/feed/posts?page="+ page
     const graphqlQuery = {
       query: `
       {
@@ -136,7 +136,7 @@ class Feed extends Component {
       }
       `,
     };
-    fetch("http://localhost:8081/graphql", {
+    fetch(process.env.REACT_APP_API_URL + "/graphql", {
       method: "POST",
       headers: {
         authorization: "Bearer " + this.props.token,
@@ -180,7 +180,7 @@ class Feed extends Component {
       }
       `,
     };
-    fetch("http://localhost:8081/graphql", {
+    fetch(process.env.REACT_APP_API_URL +"/graphql", {
       method: "POST",
       headers: {
         authorization: "Bearer " + this.props.token,
@@ -229,10 +229,10 @@ class Feed extends Component {
 
     // Set up data (with image!)
     // REST config
-    // let url = "http://localhost:8081/feed/post";
+    // let url = "http://localhost:8080/feed/post";
     // let method = "POST";
     // if (this.state.editPost) {
-    //   url = "http://localhost:8081/feed/post/" + this.state.editPost._id;
+    //   url = "http://localhost:8080/feed/post/" + this.state.editPost._id;
     //   method = "PUT";
     // }
     const formData = new FormData();
@@ -243,7 +243,7 @@ class Feed extends Component {
     if (this.state.editPost) {
       formData.append("oldPath", this.state.editPost.imagePath);
     }
-    fetch("http://localhost:8081/post-image", {
+    fetch(process.env.REACT_APP_API_URL+"/post-image", {
       headers: {
         authorization: "Bearer " + this.props.token,
       },
@@ -288,7 +288,7 @@ class Feed extends Component {
               `,
           };
         }
-        return fetch("http://localhost:8081/graphql", {
+        return fetch(process.env.REACT_APP_API_URL+"/graphql", {
           headers: {
             authorization: "Bearer " + this.props.token,
             "Content-Type": "application/json",
@@ -383,7 +383,7 @@ class Feed extends Component {
 
   deletePostHandler = (postId) => {
     this.setState({ postsLoading: true });
-    // REST "http://localhost:8081/feed/post/" + postId
+    // REST "http://localhost:8080/feed/post/" + postId
 
     const graphqlQuery = {
       query: `
@@ -393,7 +393,7 @@ class Feed extends Component {
         `,
     };
 
-    fetch("http://localhost:8081/graphql", {
+    fetch(process.env.REACT_APP_API_URL+"/graphql", {
       headers: {
         authorization: "Bearer " + this.props.token,
         "Content-Type": "application/json",
