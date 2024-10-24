@@ -6,7 +6,7 @@ services:
       context: ./server
       dockerfile: Dockerfile
     ports:
-      - "8081:8081"
+      - "8083:8081" # left docker expose / right what is my app is running on inside and outsife of docker in my case.
     
     environment:
       - DB_HOST=mongodb_server
@@ -27,7 +27,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8081:80"  # Map Nginx's port 80 to your local port 80
+      - "8082:80"  # Map Nginx's port 80 to your local port 80
     volumes:
       - .:/app  # Optional if you need live file mounting
     environment:
@@ -40,9 +40,8 @@ services:
     image: mongo:latest
     restart: always
     environment:
-    - DB_HOST=mongodb
-    - MONGO_INITDB_ROOT_USERNAME=alaa
-    - MONGO_INITDB_ROOT_PASSWORD=VGBROuEktfc8EC6A
+      MONGO_INITDB_ROOT_USERNAME: alaa
+      MONGO_INITDB_ROOT_PASSWORD: VGBROuEktfc8EC6A
     volumes:
      - mydata:/data/db
 
