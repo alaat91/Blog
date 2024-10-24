@@ -27,7 +27,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "80:80"  # Map Nginx's port 80 to your local port 80
+      - "8082:80"  # Map Nginx's port 80 to your local port 80
     volumes:
       - .:/app  # Optional if you need live file mounting
     environment:
