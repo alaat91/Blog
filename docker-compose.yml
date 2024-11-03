@@ -19,7 +19,7 @@ services:
     restart: always
 
     depends_on:
-      - mongodb
+      - mongo
 
   # Client service
   client:
@@ -35,17 +35,7 @@ services:
     restart: always  # Automatically restart container on crash
 
 
-  # Database service
-  mongodb:
+  mongo:
     image: mongo:latest
     restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: alaa
-      MONGO_INITDB_ROOT_PASSWORD: VGBROuEktfc8EC6A
-    volumes:
-     - mydata:/data/db
 
-
-# Volumes define
-volumes: 
-  mydata:
