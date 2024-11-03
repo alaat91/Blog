@@ -1,0 +1,7 @@
+/Users/alaataleb/Desktop/Blog/dotnetApp/obj/Debug/net7.0/dotnetApp.csproj.AssemblyReference.cache
+/Users/alaataleb/Desktop/Blog/dotnetApp/obj/Debug/net7.0/dotnetApp.GeneratedMSBuildEditorConfig.editorconfig
+/Users/alaataleb/Desktop/Blog/dotnetApp/obj/Debug/net7.0/dotnetApp.AssemblyInfoInputs.cache
+/Users/alaataleb/Desktop/Blog/dotnetApp/obj/Debug/net7.0/dotnetApp.AssemblyInfo.cs
+/Users/alaataleb/Desktop/Blog/dotnetApp/obj/Debug/net7.0/dotnetApp.csproj.CoreCompileInputs.cache
+/Users/alaataleb/Desktop/Blog/dotnetApp/obj/Debug/net7.0/dotnetApp.MvcApplicationPartsAssemblyInfo.cs
+/Users/alaataleb/Desktop/Blog/dotnetApp/obj/Debug/net7.0/dotnetApp.MvcApplicationPartsAssemblyInfo.cache
