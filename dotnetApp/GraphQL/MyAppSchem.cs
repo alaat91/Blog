@@ -1,3 +1,4 @@
+using GraphQL;
 using GraphQL.Types;
 
 public class MyAppSchema : Schema

@@ -1,10 +1,11 @@
-using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using dotnetApp.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class UserController : ControllerBase
 {
     private readonly UserService _userService;
@@ -15,20 +16,28 @@ public class UserController : ControllerBase
     }
 
     [HttpGet("status")]
-    [Authorize]
     public async Task<IActionResult> GetUserStatus()
     {
-        var status = await _userService.GetUserStatusAsync(User);
-        if (status == null) return NotFound("User not found.");
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var status = await _userService.GetUserStatusAsync(userId);
+        if (status == null)
+        {
+            return NotFound(new { message = "User not found." });
+        }
+
         return Ok(new { status });
     }
 
     [HttpPut("status")]
-    [Authorize]
-    public async Task<IActionResult> UpdateStatus([FromBody] StatusDto statusDto)
+    public async Task<IActionResult> UpdateStatus([FromBody] string status)
     {
-        var success = await _userService.UpdateUserStatusAsync(User, statusDto.Status);
-        if (!success) return NotFound("User not found.");
-        return Ok("Status updated successfully.");
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var updated = await _userService.UpdateUserStatusAsync(userId, status);
+        if (!updated)
+        {
+            return NotFound(new { message = "User not found or status update failed." });
+        }
+
+        return Ok(new { message = "Status updated successfully.", status });
     }
 }

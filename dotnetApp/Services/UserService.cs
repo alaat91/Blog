@@ -1,48 +1,47 @@
-using System;
+using MongoDB.Driver;
+using MongoDB.Bson;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using dotnetApp.Data;
-using dotnetApp.Models;
 
 public class UserService
 {
-    private readonly AppDbContext _context;
+    private readonly IMongoCollection<User> _users;
 
-    public UserService(AppDbContext context)
+    public UserService(IMongoClient client)
     {
-        _context = context;
+        var database = client.GetDatabase("messages");
+        _users = database.GetCollection<User>("users");
     }
 
-    public async Task<User> GetUserByIdAsync(Guid userId)
+    public async Task<User> GetUserByIdAsync(string userId)
     {
-        return await _context.Users.FirstOrDefaultAsync(u => u.Id == userId);
+        if (ObjectId.TryParse(userId, out var objectId))
+        {
+            return await _users.Find(u => u.Id == objectId).FirstOrDefaultAsync();
+        }
+        return null; // Return null if the userId is invalid
     }
 
     public async Task<User> GetUserByEmailAsync(string email)
     {
-        return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+        return await _users.Find(u => u.Email == email).FirstOrDefaultAsync();
     }
 
-    public async Task<User> CreateUserAsync(User user)
+    public async Task CreateUserAsync(User user)
     {
-        _context.Users.Add(user);
-        await _context.SaveChangesAsync();
-        return user;
+        user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+        await _users.InsertOneAsync(user);
     }
 
-    public async Task<string> GetUserStatusAsync(Guid userId)
+    public async Task<string> GetUserStatusAsync(string userId)
     {
-        var user = await _context.Users.FindAsync(userId);
-        return user?.Status;
+        var user = await GetUserByIdAsync(userId);
+        return user?.Status; // Return the user's status or null if not found
     }
 
-    public async Task<bool> UpdateUserStatusAsync(Guid userId, string status)
+    public async Task<bool> UpdateUserStatusAsync(string userId, string newStatus)
     {
-        var user = await _context.Users.FindAsync(userId);
-        if (user == null) return false;
-
-        user.Status = status;
-        await _context.SaveChangesAsync();
-        return true;
+        var update = Builders<User>.Update.Set(u => u.Status, newStatus);
+        var result = await _users.UpdateOneAsync(u => u.Id == ObjectId.Parse(userId), update);
+        return result.ModifiedCount > 0;
     }
 }

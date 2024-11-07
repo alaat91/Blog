@@ -1,59 +1,79 @@
-using System.Collections.Generic;
+using MongoDB.Driver;
+using MongoDB.Bson;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore;
-using dotnetApp.Data;
+using System.Collections.Generic;
 using dotnetApp.Models;
 
-namespace dotnetApp.Services
+public class PostService
 {
-    public class PostService
+    private readonly IMongoCollection<Post> _posts;
+    private readonly IMongoCollection<User> _users;
+
+    public PostService(IMongoClient client)
     {
-        private readonly AppDbContext _context;
+        var database = client.GetDatabase("messages");
+        _posts = database.GetCollection<Post>("posts");
+        _users = database.GetCollection<User>("users");
+    }
 
-        public PostService(AppDbContext context)
+    public async Task<List<Post>> GetPosts(int page, int pageSize)
+    {
+        return await _posts.Find(_ => true)
+            .Skip((page - 1) * pageSize)
+            .Limit(pageSize)
+            .SortByDescending(p => p.CreatedAt)
+            .ToListAsync();
+    }
+
+    public async Task<Post> GetPostById(string postId)
+    {
+        if (ObjectId.TryParse(postId, out var objectId))
         {
-            _context = context;
+            return await _posts.Find(p => p.Id == objectId).FirstOrDefaultAsync();
         }
+        return null;
+    }
 
-        public async Task<List<Post>> GetPostsAsync(int page, int pageSize = 2)
+    public async Task CreatePost(Post post)
+    {
+        await _posts.InsertOne(post);
+
+        // Update user's post list
+        var userId = post.Creator;
+        var update = Builders<User>.Update.Push(u => u.Posts, post.Id);
+        await _users.UpdateOne(u => u.Id == userId, update);
+    }
+
+    public async Task<bool> UpdatePost(string postId, Post updatedPost, string userId)
+    {
+        var post = await GetPostById(postId);
+        if (post == null || post.Creator != ObjectId.Parse(userId))
+            return false; // Post not found or user is not the creator
+
+        var update = Builders<Post>.Update
+            .Set(p => p.Title, updatedPost.Title)
+            .Set(p => p.Content, updatedPost.Content)
+            .Set(p => p.ImageUrl, updatedPost.ImageUrl)
+            .Set(p => p.UpdatedAt, DateTime.UtcNow);
+
+        var result = await _posts.UpdateOne(p => p.Id == post.Id, update);
+        return result.ModifiedCount > 0;
+    }
+
+    public async Task<bool> DeletePost(string postId, string userId)
+    {
+        var post = await GetPostById(postId);
+        if (post == null || post.Creator != ObjectId.Parse(userId))
+            return false;
+
+        var result = await _posts.DeleteOne(p => p.Id == post.Id);
+        if (result.DeletedCount > 0)
         {
-            return await _context.Posts
-                .Include(p => p.Creator)
-                .OrderByDescending(p => p.CreatedAt)
-                .Skip((page - 1) * pageSize)
-                .Take(pageSize)
-                .ToListAsync();
-        }
-
-        public async Task<Post> GetPostByIdAsync(Guid postId)
-        {
-            return await _context.Posts
-                .Include(p => p.Creator)
-                .FirstOrDefaultAsync(p => p.Id == postId);
-        }
-
-        public async Task<Post> CreatePostAsync(Post post)
-        {
-            _context.Posts.Add(post);
-            await _context.SaveChangesAsync();
-            return post;
-        }
-
-        public async Task<Post> UpdatePostAsync(Post post)
-        {
-            _context.Posts.Update(post);
-            await _context.SaveChangesAsync();
-            return post;
-        }
-
-        public async Task<bool> DeletePostAsync(Guid postId)
-        {
-            var post = await _context.Posts.FindAsync(postId);
-            if (post == null) return false;
-
-            _context.Posts.Remove(post);
-            await _context.SaveChangesAsync();
+            // Remove the post from the user's post list
+            var update = Builders<User>.Update.Pull(u => u.Posts, post.Id);
+            await _users.UpdateOne(u => u.Id == ObjectId.Parse(userId), update);
             return true;
         }
+        return false;
     }
 }

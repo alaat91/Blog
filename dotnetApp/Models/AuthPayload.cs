@@ -1,3 +1,4 @@
+
 namespace dotnetApp.Models
 {
     public class AuthPayload

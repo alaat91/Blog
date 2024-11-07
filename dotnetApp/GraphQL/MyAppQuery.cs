@@ -1,9 +1,17 @@
+using GraphQL;
 using GraphQL.Types;
+
+
 
 public class MyAppQuery : ObjectGraphType
 {
-    public MyAppQuery()
+    private readonly AuthService _authService;
+    private readonly PostService _postService;
+    public MyAppQuery(AuthService authService, PostService postService)
     {
+        _authService = authService ?? throw new ArgumentNullException(nameof(authService));
+        _postService = postService ?? throw new ArgumentNullException(nameof(postService));
+
         Field<AuthPayloadType>(
             "login",
             arguments: new QueryArguments(new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "email" },

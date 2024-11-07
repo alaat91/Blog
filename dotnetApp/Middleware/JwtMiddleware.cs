@@ -1,62 +1,69 @@
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
-using System;
+using MongoDB.Bson;
+using MongoDB.Driver;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace dotnetApp.Middleware
+public class JwtMiddleware
 {
-    public class JwtMiddleware
+    private readonly RequestDelegate _next;
+    private readonly IConfiguration _configuration;
+    private readonly IMongoCollection<User> _users;
+
+    public JwtMiddleware(RequestDelegate next, IConfiguration configuration, IMongoClient client)
     {
-        private readonly RequestDelegate _next;
-        private readonly IConfiguration _configuration;
+        _next = next;
+        _configuration = configuration;
+        var database = client.GetDatabase("messages");
+        _users = database.GetCollection<User>("users");
+    }
 
-        public JwtMiddleware(RequestDelegate next, IConfiguration configuration)
+    public async Task Invoke(HttpContext context)
+    {
+        var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
+        if (token != null)
         {
-            _next = next;
-            _configuration = configuration;
-        }
-
-        public async Task Invoke(HttpContext context)
-        {
-            var token = context.Request.Headers["Authorization"].FirstOrDefault()?.Split(" ").Last();
-
-            if (token != null)
+            var userId = ValidateToken(token);
+            if (userId != null)
             {
-                AttachUserToContext(context, token);
-            }
-
-            await _next(context);
-        }
-
-        private void AttachUserToContext(HttpContext context, string token)
-        {
-            try
-            {
-                var tokenHandler = new JwtSecurityTokenHandler();
-                var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
-                tokenHandler.ValidateToken(token, new TokenValidationParameters
+                var user = await _users.Find(u => u.Id == ObjectId.Parse(userId)).FirstOrDefaultAsync();
+                if (user != null)
                 {
-                    ValidateIssuerSigningKey = true,
-                    IssuerSigningKey = new SymmetricSecurityKey(key),
-                    ValidateIssuer = false,
-                    ValidateAudience = false,
-                    ValidateLifetime = true,
-                    ClockSkew = TimeSpan.Zero
-                }, out SecurityToken validatedToken);
-
-                var jwtToken = (JwtSecurityToken)validatedToken;
-                var userId = jwtToken.Claims.First(x => x.Type == "userId").Value;
-
-                context.Items["User"] = userId;
+                    var claims = new[] { new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()) };
+                    var identity = new ClaimsIdentity(claims, "jwt");
+                    context.User = new ClaimsPrincipal(identity);
+                }
             }
-            catch
+        }
+        await _next(context);
+    }
+
+    private string ValidateToken(string token)
+    {
+        try
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
+            tokenHandler.ValidateToken(token, new TokenValidationParameters
             {
-                // do nothing if JWT validation fails
-            }
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(key),
+                ValidateIssuer = false,
+                ValidateAudience = false,
+                ClockSkew = TimeSpan.Zero
+            }, out SecurityToken validatedToken);
+
+            var jwtToken = (JwtSecurityToken)validatedToken;
+            return jwtToken.Claims.First(x => x.Type == "id").Value;
+        }
+        catch
+        {
+            return null;
         }
     }
 }

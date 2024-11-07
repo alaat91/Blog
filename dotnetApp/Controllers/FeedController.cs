@@ -1,61 +1,62 @@
-using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using dotnetApp.Services;
-using dotnetApp.Models;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
+using System.Threading.Tasks;
+using MongoDB.Bson;
 
 [Route("api/[controller]")]
 [ApiController]
+[Authorize]
 public class FeedController : ControllerBase
 {
-    private readonly FeedService _feedService;
+    private readonly PostService _postService;
 
-    public FeedController(FeedService feedService)
+    public FeedController(PostService postService)
     {
-        _feedService = feedService;
+        _postService = postService;
     }
 
     [HttpGet("posts")]
-    [Authorize]
-    public async Task<IActionResult> GetPosts([FromQuery] int page = 1)
+    public async Task<IActionResult> GetPosts([FromQuery] int page = 1, [FromQuery] int pageSize = 2)
     {
-        var posts = await _feedService.GetPostsAsync(page);
-        return Ok(posts);
-    }
-
-    [HttpGet("post/{postId}")]
-    [Authorize]
-    public async Task<IActionResult> GetSinglePost(string postId)
-    {
-        var post = await _feedService.GetSinglePostAsync(postId);
-        if (post == null) return NotFound("Post not found.");
-        return Ok(post);
+        var posts = await _postService.GetPostsAsync(page, pageSize);
+        var totalItems = posts.Count;
+        return Ok(new { posts, totalItems });
     }
 
     [HttpPost("post")]
-    [Authorize]
-    public async Task<IActionResult> CreatePost([FromBody] PostDto post)
+    public async Task<IActionResult> CreatePost([FromBody] Post post)
     {
-        var newPost = await _feedService.CreatePostAsync(post, User);
-        if (newPost == null) return BadRequest("Failed to create post.");
-        return CreatedAtAction(nameof(CreatePost), new { id = newPost.Id }, newPost);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        post.Creator = ObjectId.Parse(userId);
+
+        await _postService.CreatePostAsync(post);
+        return CreatedAtAction(nameof(GetPosts), new { id = post.Id }, post);
     }
 
-    [HttpPut("post/{postId}")]
-    [Authorize]
-    public async Task<IActionResult> UpdatePost(string postId, [FromBody] PostDto post)
+    [HttpPut("post/{id}")]
+    public async Task<IActionResult> UpdatePost(string id, [FromBody] Post updatedPost)
     {
-        var updatedPost = await _feedService.UpdatePostAsync(postId, post, User);
-        if (updatedPost == null) return NotFound("Post not found.");
-        return Ok(updatedPost);
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var updated = await _postService.UpdatePostAsync(id, updatedPost, userId);
+        if (!updated)
+        {
+            return NotFound(new { message = "Post not found or user not authorized." });
+        }
+
+        return Ok(new { message = "Post updated successfully." });
     }
 
-    [HttpDelete("post/{postId}")]
-    [Authorize]
-    public async Task<IActionResult> DeletePost(string postId)
+    [HttpDelete("post/{id}")]
+    public async Task<IActionResult> DeletePost(string id)
     {
-        var success = await _feedService.DeletePostAsync(postId, User);
-        if (!success) return NotFound("Post not found.");
-        return Ok("Post deleted successfully.");
+        var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+        var deleted = await _postService.DeletePostAsync(id, userId);
+        if (!deleted)
+        {
+            return NotFound(new { message = "Post not found or user not authorized." });
+        }
+
+        return Ok(new { message = "Post deleted successfully." });
     }
 }

@@ -6,8 +6,9 @@ public class UserInputType : InputObjectGraphType
     {
         Name = "UserInput";
         Field<NonNullGraphType<StringGraphType>>("email");
-        Field<NonNullGraphType<StringGraphType>>("name");
         Field<NonNullGraphType<StringGraphType>>("password");
+        Field<StringGraphType>("name");
     }
 }
+
 

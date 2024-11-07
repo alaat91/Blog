@@ -6,7 +6,8 @@ public class PostInputType : InputObjectGraphType
     {
         Name = "PostInput";
         Field<NonNullGraphType<StringGraphType>>("title");
-        Field<NonNullGraphType<StringGraphType>>("content");
-        Field<NonNullGraphType<StringGraphType>>("imageUrl");
+        Field<StringGraphType>("content");
+        Field<StringGraphType>("imageUrl");
     }
 }
+

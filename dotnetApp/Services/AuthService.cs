@@ -6,52 +6,70 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using BCrypt.Net;
 using dotnetApp.Models;
-using dotnetApp.Data;
+using System.Threading.Tasks;
+using MongoDB.Driver;
 
 public class AuthService
 {
     private readonly UserService _userService;
     private readonly IConfiguration _configuration;
-
+    private readonly IMongoCollection<User> _users;
     public AuthService(UserService userService, IConfiguration configuration)
     {
         _userService = userService;
         _configuration = configuration;
+        
+
     }
-
-    public async Task<User> SignupAsync(UserDto userDto)
+    public string GenerateJwtToken(string userId)
     {
-        var hashedPassword = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
-        var user = new User
-        {
-            Email = userDto.Email,
-            Password = hashedPassword,
-            Name = userDto.Name
-        };
-        return await _userService.CreateUserAsync(user);
-    }
-
-    public async Task<string> LoginAsync(LoginDto loginDto)
-    {
-        var user = await _userService.GetUserByEmailAsync(loginDto.Email);
-        if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.Password))
-        {
-            return null;
-        }
-
         var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(_configuration["Jwt:Key"]);
+        var key = Encoding.UTF8.GetBytes(_configuration["Jwt:Key"]);
+
         var tokenDescriptor = new SecurityTokenDescriptor
         {
-            Subject = new ClaimsIdentity(new[] 
-            { 
-                new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Email, user.Email)
-            }),
-            Expires = DateTime.UtcNow.AddHours(1),
+            Subject = new ClaimsIdentity(new[] { new Claim("id", userId) }),
+            Expires = DateTime.UtcNow.AddDays(7), // Set token expiration as desired
             SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
         };
+
         var token = tokenHandler.CreateToken(tokenDescriptor);
         return tokenHandler.WriteToken(token);
     }
+    
+    public async Task<AuthPayload> Signup(UserDto userDto)
+    {
+        var user = new User
+        {
+            Email = userDto.Email,
+            Password = BCrypt.Net.BCrypt.HashPassword(userDto.Password),
+            Name = userDto.Name
+        };
+        await _users.InsertOneAsync(user);
+
+        var token = GenerateJwtToken(user.Id);
+        return new AuthPayload
+        {
+            Token = token,
+            UserId = user.Id
+        };
+    }
+
+
+    public async Task<AuthPayload> Login(LoginDto loginDto)
+    {
+        var user = await _users.Find(u => u.Email == loginDto.Email).FirstOrDefaultAsync();
+        if (user == null || !BCrypt.Net.BCrypt.Verify(loginDto.Password, user.Password))
+        {
+            throw new UnauthorizedAccessException("Invalid credentials.");
+        }
+
+        var token = GenerateJwtToken(user.Id); // Ensure `GenerateJwtToken` is implemented
+        return new AuthPayload
+        {
+            Token = token,
+            UserId = user.Id
+        };
+    }
+
 }

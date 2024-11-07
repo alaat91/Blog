@@ -1,5 +1,5 @@
+using GraphQL;
 using GraphQL.Types;
-
 public class MyAppMutation : ObjectGraphType
 
 {
@@ -7,31 +7,60 @@ public class MyAppMutation : ObjectGraphType
     private readonly UserService _userService;
     private readonly PostService _postService;
     
-    public MyAppMutation()
+    public MyAppMutation(UserService userService, PostService postService)
     {
-        Field<UserType>(
+        _userService = userService ?? throw new ArgumentNullException(nameof(userService));
+        _postService = postService ?? throw new ArgumentNullException(nameof(postService));
+
+         Field<UserType>(
             "createUser",
-            arguments: new QueryArguments(new QueryArgument<NonNullGraphType<UserInputType>> { Name = "userInput" }),
-            resolve: context => userService.CreateUser(context.GetArgument<UserInput>("userInput"))
+            arguments: new QueryArguments(new QueryArgument<NonNullGraphType<UserInputType>> { Name = "user" }),
+            resolve: context =>
+            {
+                var userInput = context.GetArgument<User>("user");
+                return userService.CreateUserAsync(userInput);
+            }
         );
 
-        Field<PostType>(
+        Field<PostDataType>(
             "createPost",
-            arguments: new QueryArguments(new QueryArgument<NonNullGraphType<PostInputType>> { Name = "postInput" }),
-            resolve: context => postService.CreatePost(context.GetArgument<PostInput>("postInput"))
+            arguments: new QueryArguments(new QueryArgument<NonNullGraphType<PostInputType>> { Name = "post" }),
+            resolve: context =>
+            {
+                var postInput = context.GetArgument<Post>("post");
+                return postService.CreatePostAsync(postInput);
+            }
         );
 
-        Field<PostType>(
-            "updatePost",
-            arguments: new QueryArguments(new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "id" },
-                                          new QueryArgument<NonNullGraphType<PostInputType>> { Name = "postInput" }),
-            resolve: context => postService.UpdatePost(context.GetArgument<string>("id"), context.GetArgument<PostInput>("postInput"))
-        );
+        Field<PostDataType>(
+        "updatePost",
+        arguments: new QueryArguments(
+            new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "postId" },
+            new QueryArgument<NonNullGraphType<PostInputType>> { Name = "postInput" },
+            new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "userId" }
+        ),
+        resolve: context => 
+        {
+            var postId = context.GetArgument<string>("postId");
+            var postInput = context.GetArgument<Post>("postInput");
+            var userId = context.GetArgument<string>("userId");
+            return _postService.UpdatePostAsync(postId, postInput, userId);
+        }
+    );
 
-        Field<BooleanGraphType>(
-            "deletePost",
-            arguments: new QueryArguments(new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "id" }),
-            resolve: context => postService.DeletePost(context.GetArgument<string>("id"))
-        );
+    Field<BooleanGraphType>(
+    "deletePost",
+    arguments: new QueryArguments(
+        new QueryArgument<NonNullGraphType<IdGraphType>> { Name = "postId" },
+        new QueryArgument<NonNullGraphType<StringGraphType>> { Name = "userId" }
+    ),
+    resolve: context =>
+    {
+        var postId = context.GetArgument<string>("postId");
+        var userId = context.GetArgument<string>("userId");
+        return _postService.DeletePostAsync(postId, userId);
+    }
+);
+
     }
 }
