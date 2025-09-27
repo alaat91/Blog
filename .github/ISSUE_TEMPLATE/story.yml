@@ -1,6 +1,6 @@
 name: Story
 description: Describe a user story that delivers value to the user and the business
-title: "[Story]: <Action + outcome>"
+title: [Story]: <Action + outcome>
 labels: ["type: story"]
 assignees: []
 body:
@@ -95,7 +95,7 @@ body:
   - type: textarea
     id: out_of_scope
     attributes:
-      label: Out of scope
+      label: Out of scope (optional)
       placeholder: |
         Explicitly not included:
         - …
@@ -104,9 +104,9 @@ body:
       required: false
 
   - type: textarea
-    id: acceptance_criteria
+    id: acceptance_criteria 
     attributes:
-      label: Acceptance Criteria (Given / When / Then)
+      label: Acceptance Criteria (Given / When / Then) (optional)
       description: Provide 3–6 clear, testable scenarios.
       placeholder: |
         1) Given <precondition>, When <user action>, Then <expected result>
@@ -117,7 +117,7 @@ body:
 
   # --- Non-functional & Constraints ---
   - type: textarea
-    id: non_functional
+    id: non_functional 
     attributes:
       label: Non-Functional (optional)
       placeholder: |
