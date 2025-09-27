@@ -1,34 +1,21 @@
 name: Story
-description: Describe a user story to deliver value
-title: "[Story]: "
+description: Describe a user story that delivers value to the user and the business
+title: "[Story]: <Action + outcome>"
 labels: ["type: story"]
 assignees: []
 body:
-  - type: textarea
-    id: user_story
+  - type: markdown
     attributes:
-      label: User story
-      description: Use the classic format
-      placeholder: "As a <role>, I want <capability> so that <benefit>."
-    validations:
-      required: true
+      value: |
+        Use this form to capture the story, context, acceptance criteria, and rollout details.
+        Keep the **Summary** crisp (action + outcome) and make **Acceptance Criteria** testable with G/W/T.
 
-  - type: textarea
-    id: acceptance_criteria
+  # --- Meta & Planning (optional but helpful) ---
+  - type: input
+    id: parent_epic
     attributes:
-      label: Acceptance criteria
-      description: Bullet list of testable outcomes
-      placeholder: |
-        - [ ] …
-        - [ ] …
-    validations:
-      required: true
-
-  - type: dropdown
-    id: points
-    attributes:
-      label: Story points
-      options: ["1","2","3","5","8","13","21"]
+      label: Parent epic (issue URL or number)
+      placeholder: https://github.com/org/repo/issues/123
     validations:
       required: false
 
@@ -40,18 +27,193 @@ body:
     validations:
       required: false
 
-  - type: input
-    id: sprint
+  - type: dropdown
+    id: story_points
     attributes:
-      label: Sprint / Iteration (text)
-      placeholder: e.g., 2025-W40 or Sprint 18
+      label: Story points
+      options: ["1","2","3","5","8","13","21"]
+    validations:
+      required: false
+
+  - type: dropdown
+    id: risk
+    attributes:
+      label: Risk level
+      options: [High, Medium, Low]
+    validations:
+      required: false
+
+  # --- Your core sections ---
+  - type: input
+    id: summary
+    attributes:
+      label: Summary
+      description: Action + outcome (what changes for the user?)
+      placeholder: "Enable users to save drafts so they don't lose work"
+    validations:
+      required: true
+
+  - type: textarea
+    id: background
+    attributes:
+      label: Background
+      description: 2–4 lines about the user problem and context. Include relevant links.
+      placeholder: |
+        Problem/context:
+        - …
+        - …
+        Links:
+        - Design: …
+        - PRD: …
+        - Slack: …
+        - Spikes: …
+    validations:
+      required: true
+
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: What success looks like for users and the business.
+      placeholder: |
+        - User can …
+        - Business impact …
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope (optional)
+      placeholder: |
+        Included:
+        - …
+        - …
     validations:
       required: false
 
   - type: textarea
-    id: notes
+    id: out_of_scope
     attributes:
-      label: Notes
-      description: Links, designs, or API references
+      label: Out of scope
+      placeholder: |
+        Explicitly not included:
+        - …
+        - …
+    validations:
+      required: false
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance Criteria (Given / When / Then)
+      description: Provide 3–6 clear, testable scenarios.
+      placeholder: |
+        1) Given <precondition>, When <user action>, Then <expected result>
+        2) …
+        3) …
+    validations:
+      required: true
+
+  # --- Non-functional & Constraints ---
+  - type: textarea
+    id: non_functional
+    attributes:
+      label: Non-Functional (optional)
+      placeholder: |
+        Performance: e.g., p95 response < 400ms
+        Accessibility: keyboard-only, screen reader labels
+        Reliability: SLO/SLA targets
+        Security/Privacy: auth, PII handling, threat considerations
+        Localization: supported locales, date/number formats
+    validations:
+      required: false
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies & Constraints (optional)
+      placeholder: |
+        Services: …
+        Approvals: …
+        Migrations: …
+        Feature flags: …
+        Browser/OS constraints: …
+    validations:
+      required: false
+
+  # --- Implementation notes for the team ---
+  - type: textarea
+    id: implementation
+    attributes:
+      label: Implementation Notes (optional)
+      placeholder: |
+        API: endpoints/contracts
+        Data: schema changes, migrations
+        Tests: unit/e2e cases to add
+        UX: states/empty/error/loading
+    validations:
+      required: false
+
+  # --- Rollout plan ---
+  - type: textarea
+    id: rollout
+    attributes:
+      label: Rollout (optional)
+      placeholder: |
+        Flag: <flag-name>, default OFF
+        Envs: staging → prod (who verifies in prod?)
+        Phases: % of traffic / cohorts
+        Rollback: toggle flag / revert migration
+    validations:
+      required: false
+
+  # --- Observability & success metrics ---
+  - type: textarea
+    id: observability
+    attributes:
+      label: Observability & Metrics (optional)
+      placeholder: |
+        Instrumentation: analytics event names, logs, alerts
+        Dashboards: links
+        Alerts: thresholds and routing
+    validations:
+      required: false
+
+  - type: textarea
+    id: success_metrics
+    attributes:
+      label: Success metrics / KPIs
+      placeholder: |
+        Primary: <metric & target>
+        Guardrails: <metric & threshold>
+    validations:
+      required: false
+
+  # --- Quality gates & evidence of done ---
+  - type: checkboxes
+    id: quality_gates
+    attributes:
+      label: Quality gates (tick as you complete)
+      options:
+        - label: UX review done
+        - label: Security review (as needed)
+        - label: Docs updated (user/admin/dev)
+        - label: Telemetry/events reviewed
+        - label: Feature flag created
+        - label: Test plan approved
+    validations:
+      required: false
+
+  - type: textarea
+    id: evidence
+    attributes:
+      label: Evidence of Done
+      description: Attach or paste links.
+      placeholder: |
+        PRs: …
+        Screenshots: …
+        Test runs: …
+        Dashboards: …
     validations:
       required: false
