@@ -1,6 +1,6 @@
 name: Story
 description: Describe a user story that delivers value to the user and the business
-title: [Story]: <Action + outcome>
+title: "[Story]: <Action + outcome>"
 labels: ["type: story"]
 assignees: []
 body:
