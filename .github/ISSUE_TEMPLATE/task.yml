@@ -26,6 +26,14 @@ body:
     validations:
       required: true
 
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options: [P0, P1, P2, P3]
+    validations:
+      required: false
+
   - type: textarea
     id: background
     attributes:
@@ -58,14 +66,6 @@ body:
         - Approval from <owner>
     validations:
       required: true
-
-  - type: dropdown
-    id: priority
-    attributes:
-      label: Priority
-      options: [P0, P1, P2, P3]
-    validations:
-      required: false
 
   - type: textarea
     id: risks
