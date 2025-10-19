@@ -10,7 +10,7 @@ body:
       label: Parent (Story or Epic)
       placeholder: https://github.com/org/repo/issues/123
     validations:
-      required: false
+      required: true
 
   - type: input
     id: summary
@@ -61,7 +61,7 @@ body:
       label: Expected
       placeholder: "File saves and success toast appears"
     validations:
-      required: true
+      required: false
 
   - type: textarea
     id: actual
@@ -70,7 +70,7 @@ body:
       description: What actually happens. Include screenshots/logs.
       placeholder: "500 error; console shows TypeError at SaveAction"
     validations:
-      required: true
+      required: false
 
   - type: textarea
     id: scope_notes
