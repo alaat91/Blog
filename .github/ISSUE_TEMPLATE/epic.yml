@@ -1,0 +1,139 @@
+name: Epic
+description: Large body of work composed of linked stories/tasks with a clear outcome
+title: "[Epic]: <goal or outcome>"
+labels: ["type: epic", "roadmap"]
+assignees: []
+body:
+  - type: input
+    id: summary
+    attributes:
+      label: Epic Summary
+      placeholder: "Self-serve billing for SMB customers"
+    validations:
+      required: true
+
+  - type: textarea
+    id: goals
+    attributes:
+      label: Goals & Outcomes
+      placeholder: |
+        - Outcome 1 …
+        - Outcome 2 …
+    validations:
+      required: true
+
+  - type: textarea
+    id: issue_types
+    attributes:
+      label: Issue Types
+      description: Link the predefined user stories, tasks, and subtasks under this epic.
+      placeholder: |
+        - [ ] org/repo#123 (Story)
+        - [ ] org/repo#124 (Task)
+        - [ ] org/repo#125 (Subtask)
+    validations:
+      required: false
+
+  - type: textarea
+    id: field_values
+    attributes:
+      label: Field Values / Defaults
+      description: Priority, assignees, due dates, labels; pre-fill to match team standards.
+      placeholder: |
+        Priority: P1
+        Assignees: @owner1, @owner2
+        Due date: YYYY-MM-DD
+        Labels: team:platform, area:billing
+    validations:
+      required: false
+
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: Link blockers or related work.
+      placeholder: |
+        Blocked by: org/repo#200
+        Relates to: org/repo#198
+    validations:
+      required: false
+
+  - type: textarea
+    id: stakeholders
+    attributes:
+      label: Stakeholders & Owners
+      description: List key stakeholders and default assignees.
+      placeholder: |
+        PM: @pm-handle
+        Tech Lead: @tl-handle
+        Design: @design-handle
+        QA: @qa-handle
+    validations:
+      required: false
+
+  - type: textarea
+    id: checklists
+    attributes:
+      label: Epic Checklist (high-level)
+      placeholder: |
+        - [ ] Kickoff complete
+        - [ ] Milestone 1 delivered
+        - [ ] Docs updated
+        - [ ] GA rollout complete
+    validations:
+      required: false
+
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope (in) / Out of Scope
+      placeholder: |
+        In scope:
+        - …
+        Out of scope:
+        - …
+    validations:
+      required: false
+
+  - type: textarea
+    id: metrics
+    attributes:
+      label: Success Metrics / KPIs
+      placeholder: |
+        Primary: conversion to paid +2pp
+        Guardrails: support tickets ≤ baseline
+    validations:
+      required: false
+
+  - type: input
+    id: target_start
+    attributes:
+      label: Target start (YYYY-MM-DD)
+    validations:
+      required: false
+
+  - type: input
+    id: target_end
+    attributes:
+      label: Target end (YYYY-MM-DD)
+    validations:
+      required: false
+
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risks & Mitigations
+      placeholder: |
+        - Risk: …
+          Mitigation: …
+    validations:
+      required: false
+
+  - type: textarea
+    id: communications
+    attributes:
+      label: Comms Plan (optional)
+      placeholder: |
+        Release notes, status update cadence, stakeholder channels.
+    validations:
+      required: false
