@@ -1,0 +1,75 @@
+name: Subtask
+description: A small, well-bounded piece of work linked to a parent Story/Task/Epic
+title: "[Subtask]: <Action + outcome>"
+labels: ["type: subtask"]
+assignees: []
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Keep subtasks small (ideally < 1 day). Always link a parent.
+
+  - type: input
+    id: parent
+    attributes:
+      label: Parent (Story / Task / Epic) — URL or #number
+      placeholder: "https://github.com/org/repo/issues/123  or  #123"
+    validations:
+      required: true
+
+  - type: input
+    id: summary
+    attributes:
+      label: Summary
+      description: Action + outcome
+      placeholder: "Add retry/backoff to billing webhook consumer"
+    validations:
+      required: true
+
+  - type: textarea
+    id: deliverables
+    attributes:
+      label: Deliverables
+      placeholder: |
+        - Code / script / config
+        - Doc / runbook update
+        - Dashboard panel
+    validations:
+      required: true
+
+  - type: textarea
+    id: acceptance_criteria
+    attributes:
+      label: Acceptance Criteria
+      placeholder: |
+        - Unit test added for retry logic
+        - CI passes
+        - Observability updated (log/metric)
+    validations:
+      required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options: [P0, P1, P2, P3]
+    validations:
+      required: false
+
+  - type: textarea
+    id: risks
+    attributes:
+      label: Risks (optional)
+      placeholder: |
+        Downtime/data risks + mitigations/backout steps.
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: quality_gates
+    attributes:
+      label: Quality gates (tick as complete)
+      options:
+        - label: Tests updated
+        - label: Docs/runbooks updated
+        - label: Monitoring updated
