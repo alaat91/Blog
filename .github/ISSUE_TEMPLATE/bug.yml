@@ -1,0 +1,96 @@
+name: Bug
+description: Report a defect with clear environment, severity, and reproducible steps
+title: "[Bug]: <symptom + where>"
+labels: ["type: bug"]
+assignees: []
+body:
+  - type: input
+    id: parent
+    attributes:
+      label: Parent (Story or Epic)
+      placeholder: https://github.com/org/repo/issues/123
+    validations:
+      required: false
+
+  - type: input
+    id: summary
+    attributes:
+      label: Summary
+      placeholder: "Crash on Save in Editor"
+    validations:
+      required: true
+
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      placeholder: |
+        App version: x.y.z
+        Env: prod/stage
+        OS/Browser: macOS 14.5 / Chrome 126
+        Device/Locale: …
+    validations:
+      required: true
+
+  - type: dropdown
+    id: severity
+    attributes:
+      label: Severity
+      description: P1 (data loss/security outage) / P2 (major broken path) / P3 (minor)
+      options:
+        - P1 — data loss / security outage
+        - P2 — major broken path
+        - P3 — minor
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to Reproduce (optional)
+      placeholder: |
+        1) …
+        2) …
+        3) …
+    validations:
+      required: false
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected
+      placeholder: "File saves and success toast appears"
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual
+      description: What actually happens. Include screenshots/logs.
+      placeholder: "500 error; console shows TypeError at SaveAction"
+    validations:
+      required: true
+
+  - type: textarea
+    id: scope_notes
+    attributes:
+      label: Scope Notes (optional)
+      placeholder: |
+        First bad version: build 4567 (commit abc123)
+        Affected modules: Editor, Save API
+        Known workarounds: disable autosave
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: closure_criteria
+    attributes:
+      label: Acceptance Criteria to Close
+      options:
+        - label: Repro steps no longer reproduce
+        - label: Tests added (unit/e2e/regression)
+        - label: Monitoring/alerts updated
+        - label: Linked PRs merged
+    validations:
+      required: true
