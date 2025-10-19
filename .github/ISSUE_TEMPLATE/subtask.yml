@@ -12,7 +12,7 @@ body:
   - type: input
     id: parent
     attributes:
-      label: Parent (Story / Task / Epic) — URL or #number
+      label: Parent (Story / Task / Epic) — URL or ##number
       placeholder: "https://github.com/org/repo/issues/123  or  #123"
     validations:
       required: true
@@ -25,6 +25,14 @@ body:
       placeholder: "Add retry/backoff to billing webhook consumer"
     validations:
       required: true
+
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priority
+      options: [P0, P1, P2, P3]
+    validations:
+      required: false
 
   - type: textarea
     id: deliverables
@@ -47,14 +55,6 @@ body:
         - Observability updated (log/metric)
     validations:
       required: true
-
-  - type: dropdown
-    id: priority
-    attributes:
-      label: Priority
-      options: [P0, P1, P2, P3]
-    validations:
-      required: false
 
   - type: textarea
     id: risks
