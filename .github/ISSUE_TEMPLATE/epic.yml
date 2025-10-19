@@ -86,7 +86,7 @@ body:
   - type: textarea
     id: scope
     attributes:
-      label: Scope (in) / Out of Scope
+      label: Scope (in) / Out of Scope (optional)
       placeholder: |
         In scope:
         - …
@@ -98,7 +98,7 @@ body:
   - type: textarea
     id: metrics
     attributes:
-      label: Success Metrics / KPIs
+      label: Success Metrics / KPIs (optional)
       placeholder: |
         Primary: conversion to paid +2pp
         Guardrails: support tickets ≤ baseline
@@ -122,7 +122,7 @@ body:
   - type: textarea
     id: risks
     attributes:
-      label: Risks & Mitigations
+      label: Risks & Mitigations (optional)
       placeholder: |
         - Risk: …
           Mitigation: …
