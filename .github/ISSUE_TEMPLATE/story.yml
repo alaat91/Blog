@@ -17,7 +17,7 @@ body:
       label: Parent epic (issue URL or number)
       placeholder: https://github.com/org/repo/issues/123
     validations:
-      required: false
+      required: true
 
   - type: dropdown
     id: priority
