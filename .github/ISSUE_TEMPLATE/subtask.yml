@@ -48,13 +48,13 @@ body:
   - type: textarea
     id: acceptance_criteria
     attributes:
-      label: Acceptance Criteria
+      label: Acceptance Criteria (optional)
       placeholder: |
         - Unit test added for retry logic
         - CI passes
         - Observability updated (log/metric)
     validations:
-      required: true
+      required: false
 
   - type: textarea
     id: risks
